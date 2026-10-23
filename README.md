@@ -1,50 +1,28 @@
-# QuickSort Studio ⚡ — Interactive Visual Learning Lab
+# Quick Sort Lab
 
-An interactive, visual, and gamified e-learning platform designed to help developers and computer science students master the QuickSort algorithm from intuition to deep technical mastery.
+An interactive website that teaches quick sort in C. It is a single self-contained file with no build step and no dependencies.
 
-## ✨ Features
+## Files
+- `index.html`: the whole website (HTML, CSS and JavaScript). Open it in any browser.
+- `quicksort.c`: the clean C program used in the lessons. Build it with `gcc quicksort.c -o quicksort && ./quicksort`.
+- `QuickSort_Presentation.pdf`: the 12-slide class presentation.
 
-- **🚀 Step-by-Step Algorithm Visualizer**: Real-time animated bar visualizer showing pivot selection, pointers ($i$ and $j$), comparisons, swaps, and sorted partitions.
-- **🔄 Synchronized Code Viewer**: Live syntax-highlighted code execution line tracker synchronized with each step of Lomuto and Hoare partition schemes.
-- **🌳 Recursion Tree Visualizer**: Visual divide-and-conquer tree depicting recursive call stacks, subarray boundaries, and tree depth.
-- **📖 Step-by-Step Interactive Guide**: Comprehensive conceptual walkthrough covering partitioning strategies, time/space complexity, and pivot mechanics.
-- **🎮 Playground & Interactive Challenges**: Test your intuition by predicting pivots, calculating swap counts, and solving interactive QuickSort quizzes.
-- **📊 Complexity Lab**: Benchmark best, average, and worst-case scenarios ($O(n \log n)$ vs $O(n^2)$) with dynamic input generators.
+## Run it
+- Double-click `index.html`, or
+- From this folder run `python3 -m http.server 8000` and open http://localhost:8000
 
-## 🛠️ Tech Stack
+## What is inside
+- **Learn**: tap any bar to make it the pivot and watch the numbers split. Every tap explains why.
+- **Watch**: step through the algorithm with narration, a "Why?" explanation, the highlighted C line, and the recursion stack.
+- **Practice**: answer "is this number smaller than the pivot?" and "where does the pivot go?" with instant feedback.
 
-- **Core**: Vanilla HTML5, CSS3, JavaScript (ES Modules)
-- **Tooling**: [Vite](https://vitejs.dev/)
-- **Design**: Modern Dark Mode, Glassmorphism, Google Fonts (`Inter`, `Outfit`, `Fira Code`)
+## Where to change things (for the Antigravity agent or by hand)
+- Step engine: `buildSteps()` in the `<script>` block. Each step has `text` (what happens) and `why` (the explanation).
+- Colours and fonts: the `:root` tokens at the top of the `<style>` block (light and dark themes).
+- Code panel text: the `CODE` array. Full program shown in the page: the `FULL` constant.
+- Fonts load from Google Fonts. Without internet the page falls back to system fonts and still works.
 
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Node.js (v18+ recommended)
-- npm or yarn or pnpm
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/shinojchowallur/e-learning-quick-sort.git
-cd e-learning-quick-sort
-
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-```
-
-### Production Build
-
-```bash
-npm run build
-npm run preview
-```
-
-## 📄 License
-
-MIT
+## Ideas to extend
+- Add other algorithms (merge sort, bubble sort) as new step builders.
+- Pivot strategies: first, middle, random, median of three.
+- A quiz mode and a "worst case" comparison chart.

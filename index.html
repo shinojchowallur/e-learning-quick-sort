@@ -1,165 +1,793 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>QuickSort Studio — Interactive Visual Learning Lab</title>
-    <meta name="description" content="Master QuickSort through interactive step-by-step visualizations, synchronized code execution, divide-and-conquer recursion trees, and gamified challenges." />
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quick Sort Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout concept: one workbench. Learn = a hand-played sandbox, Watch = a stepper wired to the C code, Practice = the same stepper, but the student answers. */
+:root{
+  --bg:#f5f6fb; --surface:#ffffff; --surface2:#eceffa; --fg:#141830; --muted:#566080; --line:#dce0ef;
+  --accent:#4338ca; --accent-fg:#ffffff;
+  --small:#15803d; --small-fg:#ffffff;
+  --big:#d6432e; --big-fg:#ffffff;
+  --pivot:#f5a30a; --pivot-fg:#2a1c00;
+  --fixed:#4f46e5; --fixed-fg:#ffffff;
+  --plain:#cfd5ea; --plain-fg:#252b4a;
+  --code-bg:#14172b; --code-fg:#e4e7f6; --code-dim:#6f7699;
+  --good-bg:#dff4e6; --bad-bg:#fde4df; --warn-bg:#fdf0cf;
+  --font-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --font-body:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0d0f20; --surface:#171a31; --surface2:#20244a; --fg:#eceefb; --muted:#9ba3c6; --line:#2c3158;
+  --accent:#9a9bf7; --accent-fg:#10113a;
+  --small:#34c274; --small-fg:#05230f; --big:#f4806f; --big-fg:#2d0a05;
+  --pivot:#f7bd45; --pivot-fg:#2a1c00; --fixed:#7f80f5; --fixed-fg:#0f1030;
+  --plain:#3a4068; --plain-fg:#e6e8f8;
+  --code-bg:#090b19; --code-fg:#e4e7f6; --code-dim:#6f7699;
+  --good-bg:#12361f; --bad-bg:#40191a; --warn-bg:#3d3112; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d0f20; --surface:#171a31; --surface2:#20244a; --fg:#eceefb; --muted:#9ba3c6; --line:#2c3158;
+  --accent:#9a9bf7; --accent-fg:#10113a;
+  --small:#34c274; --small-fg:#05230f; --big:#f4806f; --big-fg:#2d0a05;
+  --pivot:#f7bd45; --pivot-fg:#2a1c00; --fixed:#7f80f5; --fixed-fg:#0f1030;
+  --plain:#3a4068; --plain-fg:#e6e8f8;
+  --code-bg:#090b19; --code-fg:#e4e7f6; --code-dim:#6f7699;
+  --good-bg:#12361f; --bad-bg:#40191a; --warn-bg:#3d3112; color-scheme:dark}
 
-    <!-- Google Fonts: Outfit & Inter & Fira Code -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
-  </head>
-  <body>
-    <!-- App Container -->
-    <div id="app" class="app-root">
-      <!-- Global Navigation Header -->
-      <header class="app-header glass-panel">
-        <div class="header-left">
-          <div class="brand-logo">
-            <span class="brand-icon">⚡</span>
-            <div class="brand-text">
-              <h1 class="brand-title">QuickSort <span class="gradient-text">Studio</span></h1>
-              <span class="brand-subtitle">Interactive Learning Lab</span>
-            </div>
-          </div>
-        </div>
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:16px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 48px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1,h2,h3{font-family:var(--font-display);line-height:1.12;text-wrap:balance;margin:0}
+p{margin:0}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 
-        <!-- Main Navigation Tabs -->
-        <nav class="main-nav" role="tablist">
-          <button class="nav-tab active" data-tab="visualizer" id="tabVisualizer" role="tab" aria-selected="true">
-            <span class="tab-icon">🚀</span>
-            <span class="tab-label">Visualizer</span>
-          </button>
-          <button class="nav-tab" data-tab="walkthrough" id="tabWalkthrough" role="tab" aria-selected="false">
-            <span class="tab-icon">📖</span>
-            <span class="tab-label">Learn Step-by-Step</span>
-          </button>
-          <button class="nav-tab" data-tab="playground" id="tabPlayground" role="tab" aria-selected="false">
-            <span class="tab-icon">🎮</span>
-            <span class="tab-label">Playground & Quiz</span>
-          </button>
-          <button class="nav-tab" data-tab="complexity" id="tabComplexity" role="tab" aria-selected="false">
-            <span class="tab-icon">📊</span>
-            <span class="tab-label">Complexity Lab</span>
-          </button>
-        </nav>
+/* top bar */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:800;font-size:22px;letter-spacing:-.01em}
+.brand svg{width:30px;height:30px}
+.tabs{display:flex;gap:4px;background:var(--surface2);padding:4px;border-radius:14px}
+.tab{border:0;background:transparent;padding:9px 18px;border-radius:10px;font-weight:700;cursor:pointer;color:var(--muted)}
+.tab[aria-selected="true"]{background:var(--surface);color:var(--fg);box-shadow:0 1px 3px rgba(20,24,48,.18)}
+.tab:hover{color:var(--fg)}
 
-        <!-- Header Actions -->
-        <div class="header-right">
-          <button class="btn btn-sm btn-ghost" id="btnHelpModal" title="Keyboard Shortcuts & Guide">
-            <span class="btn-icon">⌨️</span>
-            <span class="btn-label-desktop">Shortcuts</span>
-          </button>
-        </div>
-      </header>
+/* shared bits */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.btn{border:1px solid var(--line);background:var(--surface);padding:9px 14px;border-radius:12px;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;gap:8px;line-height:1.1}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.btn svg{width:16px;height:16px;fill:currentColor}
+.btn[disabled]{opacity:.45;cursor:default}
+.btn.icon{padding:9px 11px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:14px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.legend i{width:14px;height:14px;border-radius:5px;display:inline-block}
+.sw-small{background:var(--small)}.sw-big{background:var(--big)}.sw-pivot{background:var(--pivot)}.sw-fixed{background:var(--fixed)}.sw-plain{background:var(--plain)}
 
-      <!-- Main Dynamic Content -->
-      <main class="app-content">
-        <!-- Tab 1: Visualizer Stage -->
-        <section class="tab-pane active" id="paneVisualizer" role="tabpanel">
-          <div class="visualizer-grid-layout">
-            <div class="visualizer-main-column" id="visualizerContainer">
-              <!-- Visualizer rendered here -->
-            </div>
-            
-            <aside class="visualizer-side-column">
-              <div class="side-tabs-header">
-                <button class="side-tab active" data-side="code">💻 Synced Code</button>
-                <button class="side-tab" data-side="tree">🌳 Recursion Tree</button>
-              </div>
-              <div class="side-panel-content">
-                <div class="side-pane active" id="sidePaneCode">
-                  <!-- CodeViewer rendered here -->
-                </div>
-                <div class="side-pane" id="sidePaneTree">
-                  <!-- RecursionTree rendered here -->
-                </div>
-              </div>
-            </aside>
-          </div>
-        </section>
+/* bars (used by both stages) */
+.bar{position:absolute;left:0;bottom:var(--base,110px);border-radius:10px 10px 4px 4px;display:flex;justify-content:center;align-items:flex-start;
+  padding-top:6px;font-family:var(--font-display);font-weight:800;font-size:var(--fs,18px);
+  transition:transform .55s cubic-bezier(.3,.75,.2,1),height .35s,background .25s,opacity .25s;will-change:transform}
+.bar.plain{background:var(--plain);color:var(--plain-fg)}
+.bar.small{background:var(--small);color:var(--small-fg)}
+.bar.big{background:var(--big);color:var(--big-fg)}
+.bar.pivot{background:var(--pivot);color:var(--pivot-fg)}
+.bar.fixed{background:var(--fixed);color:var(--fixed-fg)}
+.bar.dim{background:var(--plain);color:var(--plain-fg);opacity:.38}
+.bar.pivot::before{content:"pivot";position:absolute;top:-25px;left:50%;transform:translateX(-50%);font:700 11px var(--font-body);
+  background:var(--pivot);color:var(--pivot-fg);padding:2px 7px;border-radius:7px;letter-spacing:.03em}
+.bar.cur{outline:3px solid var(--accent);outline-offset:3px}
+.bar.pickable{cursor:pointer}
+.bar.pickable:hover{filter:brightness(1.12);outline:3px dashed var(--accent);outline-offset:3px}
+@media (prefers-reduced-motion:reduce){.bar,.chip,.range{transition:none!important}}
 
-        <!-- Tab 2: Walkthrough Guide -->
-        <section class="tab-pane" id="paneWalkthrough" role="tabpanel">
-          <div id="walkthroughContainer">
-            <!-- Walkthrough rendered here -->
-          </div>
-        </section>
+/* ---------- LEARN ---------- */
+.hero{display:flex;flex-direction:column;gap:8px;max-width:760px}
+.hero h1{font-size:clamp(30px,5vw,48px);font-weight:800;letter-spacing:-.02em}
+.hero p{font-size:18px;color:var(--muted)}
+.learn-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:20px;align-items:start}
+.sbhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.sbhead h2{font-size:22px}
+.sbstage{position:relative;height:290px;--base:30px;margin-top:6px}
+.grp{position:absolute;bottom:20px;height:240px;border:2px dashed var(--line);border-radius:14px;transition:left .55s cubic-bezier(.3,.75,.2,1),width .55s cubic-bezier(.3,.75,.2,1),border-color .3s}
+.grp.small{border-color:var(--small)}.grp.big{border-color:var(--big)}
+.sbmsg{margin-top:10px;background:var(--surface2);border-radius:12px;padding:12px 14px;min-height:150px;font-size:17px}
+.sbmsg b{font-weight:700}
+.sbmsg.done{background:var(--good-bg)}
+.sbfoot{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.sbfoot .count{margin-left:auto;color:var(--muted);font-size:14px}
+.steps{display:flex;flex-direction:column;gap:12px}
+.step{display:grid;grid-template-columns:38px minmax(0,1fr);gap:12px;align-items:start}
+.step .n{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-family:var(--font-display);font-weight:800;font-size:20px}
+.step:nth-child(2) .n{background:var(--pivot);color:var(--pivot-fg)}
+.step:nth-child(3) .n{background:var(--small);color:var(--small-fg)}
+.step:nth-child(4) .n{background:var(--fixed);color:var(--fixed-fg)}
+.step h3{font-size:19px;margin-bottom:2px}
+.step p{color:var(--muted);font-size:15.5px}
+.cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
 
-        <!-- Tab 3: Playground Challenges -->
-        <section class="tab-pane" id="panePlayground" role="tabpanel">
-          <div id="playgroundContainer">
-            <!-- Playground rendered here -->
-          </div>
-        </section>
+/* ---------- LAB ---------- */
+.labgrid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:20px;align-items:start}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.stage{position:relative;height:376px;overflow:hidden;padding:0}
+.stage .idx{position:absolute;top:276px;left:0;font:600 12px var(--font-mono);color:var(--muted);text-align:center;transition:none}
+.chip{position:absolute;left:0;width:44px;height:24px;border-radius:8px;display:grid;place-items:center;font:700 14px var(--font-mono);
+  transition:transform .45s cubic-bezier(.3,.75,.2,1),opacity .2s}
+.chip::before{content:"";position:absolute;top:-6px;left:50%;margin-left:-5px;border:5px solid transparent;border-bottom-color:inherit;border-top:0}
+#mi{top:298px;background:var(--small);color:var(--small-fg);border-color:var(--small)}
+#mj{top:326px;background:var(--pivot);color:var(--pivot-fg);border-color:var(--pivot)}
+.chip.off{opacity:0}
+.range{position:absolute;top:356px;left:0;height:4px;border-radius:3px;background:var(--accent);transition:transform .45s cubic-bezier(.3,.75,.2,1),width .45s cubic-bezier(.3,.75,.2,1),opacity .2s}
+.rangelab{position:absolute;top:360px;left:14px;font-size:11.5px;color:var(--muted)}
+.narr{min-height:132px;display:flex;flex-direction:column;gap:8px}
+.narr .meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tag{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:99px;background:var(--surface2);color:var(--fg)}
+.tag.t-pick,.tag.t-place{background:var(--pivot);color:var(--pivot-fg)}
+.tag.t-swap{background:var(--small);color:var(--small-fg)}
+.tag.t-compare{background:var(--surface2)}
+.tag.t-ask{background:var(--accent);color:var(--accent-fg)}
+.tag.t-end{background:var(--fixed);color:var(--fixed-fg)}
+.narr .stepno{font-size:13px;color:var(--muted)}
+.narr .txt{font-size:19px;line-height:1.45}
+.narr .txt b{font-weight:700}
+.why{background:var(--warn-bg);border-radius:12px;padding:10px 14px;font-size:15.5px;line-height:1.5}
+.why b{font-weight:700}
+.toggle{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);font-weight:700;cursor:pointer}
+.toggle input{accent-color:var(--accent);width:16px;height:16px}
+.sbwhy{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);font-size:15.5px;color:var(--muted)}
+.sbwhy b{color:var(--fg)}
+.ctl{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ctl .grow{flex:1;min-width:140px;display:flex;align-items:center;gap:10px}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row label{font-size:13px;font-weight:700;color:var(--muted)}
+select,input[type=text]{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-width:0}
+input[type=text]{flex:1;min-width:150px;font-family:var(--font-mono);font-size:14px}
+.stats{display:flex;gap:10px;flex-wrap:wrap}
+.stat{background:var(--surface2);border-radius:12px;padding:8px 14px;min-width:96px}
+.stat b{display:block;font:800 22px var(--font-display);font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.hint{font-size:13.5px;color:var(--muted)}
+.hint kbd{font:600 12px var(--font-mono);background:var(--surface2);border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 6px}
 
-        <!-- Tab 4: Complexity Lab -->
-        <section class="tab-pane" id="paneComplexity" role="tabpanel">
-          <div id="complexityContainer">
-            <!-- Complexity lab rendered here -->
-          </div>
-        </section>
-      </main>
+.codewrap{display:flex;flex-direction:column;gap:10px}
+.codebox{background:var(--code-bg);color:var(--code-fg);border-radius:14px;padding:12px 0;font:400 13px/1.55 var(--font-mono);overflow-x:auto}
+.cl{display:flex;white-space:pre;border-left:3px solid transparent;padding-right:14px}
+.cl .ln{width:34px;flex:none;text-align:right;padding-right:12px;color:var(--code-dim);user-select:none}
+.cl.on{background:rgba(245,163,10,.17);border-left-color:var(--pivot)}
+.cl .k{color:#c4a1ff}.cl .f{color:#78dcb6}.cl .n{color:#ffb86b}.cl .c{color:var(--code-dim)}
+.codebar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.codebar h3{font-size:18px}
+details.full{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 14px}
+details.full summary{cursor:pointer;font-weight:700}
+details.full pre{margin:10px 0 0;font:400 12.5px/1.5 var(--font-mono);overflow-x:auto;background:var(--code-bg);color:var(--code-fg);border-radius:10px;padding:12px;user-select:all}
+.stack h3{font-size:18px;margin-bottom:8px}
+.stackbox{display:flex;flex-direction:column;gap:6px;min-height:42px}
+.frame{display:flex;justify-content:space-between;gap:10px;font:600 13px var(--font-mono);background:var(--surface2);border-radius:10px;padding:8px 12px;border-left:4px solid var(--line)}
+.frame.top{border-left-color:var(--pivot);background:var(--warn-bg)}
+.frame span:last-child{color:var(--muted);font-weight:400}
+.stackbox .empty{font-size:14px;color:var(--muted)}
 
-      <!-- Footer with Keyboard shortcuts -->
-      <footer class="app-footer glass-panel">
-        <div class="footer-left">
-          <span>⚡ <strong>QuickSort Studio</strong> — An interactive visual exploration of divide & conquer.</span>
-        </div>
-        <div class="footer-center">
-          <div class="shortcut-pills">
-            <span class="kbd-pill"><kbd>Space</kbd> Play/Pause</span>
-            <span class="kbd-pill"><kbd>←</kbd> Prev</span>
-            <span class="kbd-pill"><kbd>→</kbd> Next</span>
-            <span class="kbd-pill"><kbd>R</kbd> Reset</span>
-          </div>
-        </div>
-        <div class="footer-right">
-          <span class="tech-badge">Vanilla CSS & JS</span>
-        </div>
-      </footer>
+/* practice */
+.only-practice{display:none}
+.lab[data-mode="practice"] .only-practice{display:flex}
+.lab[data-mode="practice"] p.only-practice,.lab[data-mode="practice"] .stat.only-practice{display:block}
+.lab[data-mode="practice"] .only-watch{display:none}
+.askrow{display:flex;gap:10px;flex-wrap:wrap}
+.askrow .btn{padding:12px 18px;font-size:17px}
+.btn.yes{background:var(--small);border-color:var(--small);color:var(--small-fg)}
+.btn.no{background:var(--big);border-color:var(--big);color:var(--big-fg)}
+.fb{border-radius:12px;padding:10px 14px;font-size:16.5px;background:var(--surface2)}
+.fb.ok{background:var(--good-bg)}.fb.bad{background:var(--bad-bg)}
+.shake{animation:shake .35s}
+@keyframes shake{20%{transform:translateX(-7px)}50%{transform:translateX(7px)}80%{transform:translateX(-4px)}}
+.result{display:flex;flex-direction:column;gap:10px}
+.result h3{font-size:26px}
 
-      <!-- Keyboard Shortcuts / Help Modal -->
-      <dialog id="shortcutsDialog" class="modal-dialog glass-panel">
-        <div class="modal-header">
-          <h3>⌨️ Keyboard Shortcuts & Quick Guide</h3>
-          <button type="button" class="btn-close" id="btnCloseShortcuts">✕</button>
-        </div>
-        <div class="modal-body">
-          <table class="shortcuts-table">
-            <tr>
-              <td><kbd>Space</kbd></td>
-              <td>Toggle Play / Pause simulation</td>
-            </tr>
-            <tr>
-              <td><kbd>→</kbd> Right Arrow</td>
-              <td>Step forward one operation</td>
-            </tr>
-            <tr>
-              <td><kbd>←</kbd> Left Arrow</td>
-              <td>Step backward (Time travel undo)</td>
-            </tr>
-            <tr>
-              <td><kbd>R</kbd></td>
-              <td>Reset current array to step 0</td>
-            </tr>
-          </table>
-          <hr class="modal-divider" />
-          <h4>🎨 Color Guide:</h4>
-          <ul class="modal-color-guide">
-            <li><span class="dot-gold"></span> <strong>Gold:</strong> Pivot element (the partition benchmark)</li>
-            <li><span class="dot-cyan"></span> <strong>Cyan:</strong> Pointer <code>i</code> (boundary for elements ≤ pivot)</li>
-            <li><span class="dot-purple"></span> <strong>Purple:</strong> Pointer <code>j</code> (current scanner)</li>
-            <li><span class="dot-coral"></span> <strong>Coral:</strong> Elements actively swapping</li>
-            <li><span class="dot-green"></span> <strong>Green:</strong> Elements in their final locked sorted position</li>
-          </ul>
-        </div>
-      </dialog>
+@media (max-width:900px){.learn-grid,.labgrid{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:520px){.tab{padding:9px 12px}.narr .txt{font-size:17.5px}.stat{min-width:0;flex:1}}
+</style>
+
+<style>body{margin:0}[hidden]{display:none!important}</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="topbar">
+    <div class="brand" aria-label="Quick Sort Lab">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="16" width="6" height="14" rx="2" fill="var(--small)"/><rect x="10" y="10" width="6" height="20" rx="2" fill="var(--pivot)"/><rect x="18" y="4" width="6" height="26" rx="2" fill="var(--big)"/><rect x="26" y="12" width="4" height="18" rx="2" fill="var(--fixed)"/></svg>
+      Quick Sort Lab
     </div>
+    <div class="tabs" role="tablist" aria-label="Sections">
+      <button class="tab" role="tab" id="tab-learn" data-view="learn" aria-selected="true">Learn</button>
+      <button class="tab" role="tab" id="tab-watch" data-view="watch" aria-selected="false">Watch</button>
+      <button class="tab" role="tab" id="tab-practice" data-view="practice" aria-selected="false">Practice</button>
+    </div>
+  </header>
 
-    <script type="module" src="/src/main.js"></script>
-  </body>
+  <!-- LEARN -->
+  <section id="learn" aria-labelledby="tab-learn">
+    <div class="wrap">
+      <div class="hero">
+        <h1>Sort by picking a pivot, splitting, and repeating.</h1>
+        <p>Try it with your own hands first. Tap any bar below to make it the pivot and watch the numbers split around it.</p>
+      </div>
+      <div class="learn-grid">
+        <div class="card">
+          <div class="sbhead">
+            <h2>Play quick sort by hand</h2>
+            <div class="legend"><span><i class="sw-small"></i>smaller</span><span><i class="sw-big"></i>bigger</span><span><i class="sw-fixed"></i>final place</span></div>
+          </div>
+          <div class="sbstage" id="sbStage" aria-label="Sandbox: tap a bar to choose the pivot"></div>
+          <div class="sbmsg" id="sbMsg" aria-live="polite"></div>
+          <div class="sbfoot">
+            <button class="btn" id="sbReset">Start over</button>
+            <button class="btn" id="sbShuffle">New numbers</button>
+            <span class="count" id="sbCount"></span>
+          </div>
+        </div>
+        <div class="card steps">
+          <div class="eyebrow">The whole idea, in three moves</div>
+          <div class="step"><div class="n">1</div><div><h3>Pick a pivot</h3><p>Choose any number from the group. It is the yardstick for everyone else. Our C code uses the last number.</p></div></div>
+          <div class="step"><div class="n">2</div><div><h3>Partition</h3><p>Smaller numbers go to its left, bigger numbers to its right. The pivot now sits exactly where it belongs and never moves again.</p></div></div>
+          <div class="step"><div class="n">3</div><div><h3>Repeat on each side</h3><p>The left group and the right group are smaller sorting jobs. Do the same thing in each. A group with one number is already done.</p></div></div>
+          <div class="cta">
+            <button class="btn primary" data-go="watch">Watch it run with C code</button>
+            <button class="btn" data-go="practice">Test yourself</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAB (Watch + Practice) -->
+  <section id="lab" class="lab" data-mode="watch" hidden>
+    <div class="labgrid">
+      <div class="col">
+        <div class="card stage" id="stage" aria-label="Array visualiser"></div>
+        <div class="legend">
+          <span><i class="sw-small"></i>smaller than pivot</span><span><i class="sw-big"></i>bigger than pivot</span>
+          <span><i class="sw-pivot"></i>pivot</span><span><i class="sw-fixed"></i>in final place</span><span><i class="sw-plain"></i>not checked yet</span>
+        </div>
+        <div class="card narr" id="narr" aria-live="polite">
+          <div class="meta"><span class="tag" id="narrTag">Start</span><span class="stepno" id="narrNo"></span><label class="toggle"><input type="checkbox" id="explainToggle" checked> Explain every step</label></div>
+          <div class="txt" id="narrTxt"></div>
+          <div class="askrow" id="askRow" hidden></div>
+          <div class="fb" id="fb" hidden></div>
+          <div class="why" id="why" hidden></div>
+        </div>
+
+        <div class="ctl only-watch" id="watchCtl">
+          <button class="btn icon" id="bRestart" aria-label="Back to start"><svg viewBox="0 0 24 24"><path d="M12 5V2L7 6l5 4V7a5 5 0 11-5 5H5a7 7 0 107-7z"/></svg></button>
+          <button class="btn icon" id="bPrev" aria-label="Previous step"><svg viewBox="0 0 24 24"><path d="M15 5l-8 7 8 7z"/></svg></button>
+          <button class="btn primary" id="bPlay"><svg viewBox="0 0 24 24" id="playIcon"><path d="M7 4l13 8-13 8z"/></svg><span id="playLab">Play</span></button>
+          <button class="btn icon" id="bNext" aria-label="Next step"><svg viewBox="0 0 24 24"><path d="M9 5l8 7-8 7z"/></svg></button>
+          <div class="grow"><label for="speed" class="hint">Speed</label><input type="range" id="speed" min="1" max="10" value="5"></div>
+        </div>
+        <div class="grow only-watch" style="display:flex;align-items:center;gap:10px"><label for="scrub" class="hint">Step</label><input type="range" id="scrub" min="0" max="1" value="0"></div>
+
+        <div class="row only-watch">
+          <label for="preset">Array</label>
+          <select id="preset">
+            <option value="example">Example: 8 3 7 1 5 9 4</option>
+            <option value="random">Random</option>
+            <option value="sorted">Already sorted (worst case)</option>
+            <option value="reversed">Reversed (worst case)</option>
+            <option value="dups">Many duplicates</option>
+          </select>
+          <input type="text" id="custom" placeholder="or type numbers: 12 4 9 30 2" aria-label="Custom numbers" maxlength="60">
+          <button class="btn" id="bUse">Use</button>
+        </div>
+
+        <div class="row only-practice">
+          <label for="level">Size</label>
+          <select id="level"><option value="5">Easy (5 numbers)</option><option value="7" selected>Normal (7 numbers)</option><option value="9">Hard (9 numbers)</option></select>
+          <button class="btn primary" id="pNew">New array</button>
+          <button class="btn" id="pRestart">Restart this one</button>
+        </div>
+
+        <div class="stats">
+          <div class="stat"><b id="sCmp">0</b><span>Comparisons</span></div>
+          <div class="stat"><b id="sSwp">0</b><span>Swaps</span></div>
+          <div class="stat"><b id="sFix">0/0</b><span>In final place</span></div>
+          <div class="stat only-practice"><b id="sMis">0</b><span>Mistakes</span></div>
+        </div>
+        <p class="hint only-watch">Keys: <kbd>Space</kbd> play or pause, <kbd>&larr;</kbd> <kbd>&rarr;</kbd> step.</p>
+        <p class="hint only-practice">Keys: <kbd>&larr;</kbd> smaller, <kbd>&rarr;</kbd> not smaller, <kbd>Enter</kbd> continue.</p>
+      </div>
+
+      <div class="col">
+        <div class="codewrap">
+          <div class="codebar"><h3>The C code, line by line</h3><button class="btn" id="bCopy">Copy full program</button></div>
+          <div class="codebox" id="codebox" aria-label="C source, current line highlighted"></div>
+          <details class="full" id="fullDet"><summary>Show the full C program (with main)</summary><pre id="fullCode"></pre></details>
+        </div>
+        <div class="card stack">
+          <h3>Calls waiting (the recursion stack)</h3>
+          <div class="stackbox" id="stackbox"></div>
+          <p class="hint" style="margin-top:8px">The top call is the part being worked on right now. When it finishes, the one below it continues.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=(s,r)=>(r||document).querySelector(s);
+const $$=(s,r)=>[...(r||document).querySelectorAll(s)];
+
+/* ================= C code shown in the panel ================= */
+const CODE=[
+"int partition(int arr[], int low, int high) {",
+"    int pivot = arr[high];          // last element = pivot",
+"    int i = low - 1;                // end of the smaller area",
+"",
+"    for (int j = low; j < high; j++) {",
+"        if (arr[j] < pivot) {       // smaller than pivot?",
+"            i++;",
+"            swap(&arr[i], &arr[j]); // move it to the smaller area",
+"        }",
+"    }",
+"    swap(&arr[i + 1], &arr[high]);  // pivot to its final place",
+"    return i + 1;                   // pivot index",
+"}",
+"",
+"void quickSort(int arr[], int low, int high) {",
+"    if (low < high) {                      // 2 or more numbers?",
+"        int p = partition(arr, low, high); // pivot is now fixed at p",
+"        quickSort(arr, low, p - 1);        // left part",
+"        quickSort(arr, p + 1, high);       // right part",
+"    }",
+"}"
+];
+const FULL=String.raw`#include <stdio.h>
+
+void swap(int *a, int *b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+int partition(int arr[], int low, int high) {
+    int pivot = arr[high];          // last element is the pivot
+    int i = low - 1;                // i = end of the "smaller" area
+
+    for (int j = low; j < high; j++) {
+        if (arr[j] < pivot) {       // found a smaller element
+            i++;
+            swap(&arr[i], &arr[j]); // move it into the smaller area
+        }
+    }
+    swap(&arr[i + 1], &arr[high]);  // pivot goes to its final place
+    return i + 1;                   // index of the pivot
+}
+
+void quickSort(int arr[], int low, int high) {
+    if (low < high) {                       // at least 2 elements
+        int p = partition(arr, low, high);  // pivot is now fixed at p
+        quickSort(arr, low, p - 1);         // sort the left part
+        quickSort(arr, p + 1, high);        // sort the right part
+    }
+}
+
+void printArray(int arr[], int n) {
+    for (int i = 0; i < n; i++)
+        printf("%d ", arr[i]);
+    printf("\n");
+}
+
+int main() {
+    int arr[] = {8, 3, 7, 1, 5, 9, 4};
+    int n = sizeof(arr) / sizeof(arr[0]);
+
+    printf("Before sorting: ");
+    printArray(arr, n);
+
+    quickSort(arr, 0, n - 1);
+
+    printf("After sorting : ");
+    printArray(arr, n);
+    return 0;
+}
+`;
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function hlLine(s){
+  const e=esc(s), ci=e.indexOf("//");
+  let code=ci>=0?e.slice(0,ci):e; const com=ci>=0?e.slice(ci):"";
+  code=code.replace(/\b(int|void|for|if|return)\b/g,'<span class="k">$1</span>')
+           .replace(/\b(partition|quickSort|swap)\b(?=\()/g,'<span class="f">$1</span>')
+           .replace(/\b(\d+)\b/g,'<span class="n">$1</span>');
+  return code+(com?'<span class="c">'+com+'</span>':"");
+}
+$("#codebox").innerHTML=CODE.map((l,i)=>'<div class="cl" data-l="'+i+'"><span class="ln">'+(i+1)+'</span><span>'+(l?hlLine(l):" ")+'</span></div>').join("");
+$("#fullCode").textContent=FULL;
+
+/* ================= step engine ================= */
+function buildSteps(values){
+  const n=values.length, a=values.map((_,k)=>k), V=id=>values[id];
+  const fixed=Array(n).fill(false), steps=[], stack=[];
+  let cmp=0,swp=0;
+  function snap(o){steps.push(Object.assign({arr:a.slice(),fixed:fixed.slice(),stack:stack.map(s=>({lo:s[0],hi:s[1],vals:a.slice(s[0],s[1]+1).map(V)})),
+    cmp,swp,pivot:-1,i:null,j:null,low:null,high:null,lines:[],text:"",ask:null},o));}
+  function qs(low,high,side){
+    stack.push([low,high]);
+    const cnt=high-low+1;
+    if(low<high){
+      const where=side==="root"?"Start. We want to sort the whole list":(side==="L"?"Now the left part":"Now the right part");
+      snap({kind:"call",low,high,lines:[14,15],why:"Quick sort turns one big sorting job into smaller jobs. A part with two or more numbers still needs work, so we partition it. A part with 0 or 1 number is already sorted.",text:where+" (positions "+low+" to "+high+"). It has <b>"+cnt+" numbers</b>, so we keep going."});
+      const pv=V(a[high]); let i=low-1;
+      snap({kind:"pick",low,high,pivot:high,i,lines:[16,1,2],why:"Any number could be the pivot. The last one is easy to reach as arr[high]. Think of i as a bookmark: everything at or before i is known to be smaller than the pivot. It starts at low - 1, just before this part, because nothing has been checked yet.",text:"Pick the last number as the pivot: <b>"+pv+"</b>. <b>i = "+i+"</b> means the smaller area is empty for now. <b>j</b> will scan from position "+low+"."});
+      for(let j=low;j<high;j++){
+        cmp++; const v=V(a[j]), small=v<pv;
+        snap({kind:"compare",low,high,pivot:high,i,j,lines:[4,5],small,v,pv,why:small?"The pivot is our yardstick. "+v+" is smaller than "+pv+", so it must end up on the left of the pivot. That means it has to join the smaller area.":"The pivot is our yardstick. "+v+" is not smaller than "+pv+", so it can stay on the right of the pivot. We leave it alone and move j forward. The numbers between i and j are the ones already found to be bigger.",
+          text:"j looks at <b>"+v+"</b>. Is "+v+" smaller than "+pv+"? "+(small?"<b>Yes.</b> It belongs in the smaller area.":"<b>No.</b> It is not smaller, so it stays and j moves on.")});
+        if(small){
+          i++; if(i!==j){swp++; const t=a[i]; a[i]=a[j]; a[j]=t;}
+          snap({kind:"swap",low,high,pivot:high,i,j,lines:[6,7],why:i===j?"Nothing bigger sits between i and j, so the small number is already right next to the smaller area. Swapping a box with itself keeps the order.":"i++ makes room for one more small number. The number at i was a bigger one, so the swap sends it to j and brings the small number to the end of the smaller area. All small numbers stay together on the left.",
+            text:i===j?"i moves to position <b>"+i+"</b>. That is the same box as j, so the swap changes nothing. The smaller area just grew by one."
+                      :"i moves to position <b>"+i+"</b>. Swap positions "+i+" and "+j+", so the small number <b>"+v+"</b> joins the smaller area."});
+        }
+      }
+      const p=i+1;
+      snap({kind:"before",low,high,pivot:high,i,j:high,lines:[10],ask:p,why:"Every number in this part has been compared. Up to i they are all smaller, and after i they are all bigger or equal. So the pivot belongs right between them, at i + 1. Check: "+(p-low)+" number"+((p-low)===1?" is":"s are")+" smaller than "+pv+", so the pivot needs exactly that many numbers before it in this part.",
+        text:"The scan is over. The smaller area ends at <b>i = "+i+"</b>, so the pivot <b>"+pv+"</b> belongs at position <b>i + 1 = "+p+"</b>."});
+      if(p!==high){swp++; const t=a[p]; a[p]=a[high]; a[high]=t;}
+      fixed[p]=true;
+      snap({kind:"place",low,high,pivot:-1,i:p-1,j:high,lines:[10,11],why:"The bigger number that sat at position "+p+" moves to the end, which is still the bigger side. Now everything left of "+pv+" is smaller and everything right of it is bigger or equal, so "+pv+" never has to move again. The function returns p so quickSort knows where to split the two remaining jobs.",
+        text:(p===high?"The pivot <b>"+pv+"</b> is already at position "+p+", right after the smaller area.":"Swap the pivot into position <b>"+p+"</b>.")+" <b>"+pv+"</b> is now in its final place. Smaller numbers are on its left, bigger on its right."});
+      qs(low,p-1,"L"); qs(p+1,high,"R");
+    }else{
+      if(low===high){
+        fixed[low]=true;
+        snap({kind:"base",low,high,lines:[14,15],why:"A list of 0 or 1 numbers is already sorted. This is the base case. Without it the recursion would never stop.",text:"Only one number is left here (<b>"+V(a[low])+"</b>). One number is already in its place, so we stop."});
+      }else{
+        snap({kind:"base",low:null,high:null,lines:[14,15],why:"A list of 0 or 1 numbers is already sorted. This is the base case. Without it the recursion would never stop.",text:"This part is empty, so there is nothing to sort. We stop."});
+      }
+    }
+    stack.pop();
+  }
+  qs(0,n-1,"root");
+  snap({kind:"end",lines:[],why:"Every number was either a pivot or a one-number part at some moment, and each one landed in its final place. That is how the whole list ends up sorted without comparing every number with every other number.",text:"Done. Every number is in its final place, so the list is <b>sorted</b>."});
+  return steps;
+}
+const TAGS={call:"New part",pick:"Pick pivot",compare:"Compare",swap:"Swap",before:"Pivot spot",place:"Place pivot",base:"Stop",end:"Sorted"};
+
+/* ================= LAB view ================= */
+const L={values:[],steps:[],idx:0,mode:"watch",timer:null,bars:[],idxEls:[],
+  P:{waiting:null,mistakes:0,asked:0,pt:null,done:false}};
+const stage=$("#stage");
+const PADL=62;
+function metrics(){
+  const W=stage.clientWidth||600, n=L.values.length||7;
+  const slot=Math.max(18,Math.min(78,(W-PADL-14)/n));
+  return {slot,bw:slot-8,n};
+}
+function heightOf(v){const m=Math.max.apply(null,L.values);return 44+v/m*148;}
+function buildStage(){
+  stage.innerHTML="";
+  L.bars=[];L.idxEls=[];
+  L.values.forEach((v,id)=>{
+    const el=document.createElement("div");el.className="bar plain";el.textContent=v;el.dataset.id=id;
+    el.addEventListener("click",()=>onBarClick(id));
+    stage.appendChild(el);L.bars.push(el);
+  });
+  L.values.forEach((_,p)=>{const e=document.createElement("div");e.className="idx";e.textContent=p;stage.appendChild(e);L.idxEls.push(e);});
+  const mi=document.createElement("div");mi.className="chip off";mi.id="mi";mi.textContent="i";
+  const mj=document.createElement("div");mj.className="chip off";mj.id="mj";mj.textContent="j";
+  const rg=document.createElement("div");rg.className="range";rg.id="range";
+  const rl=document.createElement("div");rl.className="rangelab";rl.id="rangelab";
+  [mi,mj,rg,rl].forEach(e=>stage.appendChild(e));
+}
+function stateOf(s,p){
+  if(s.fixed[p])return "fixed";
+  if(p===s.pivot)return "pivot";
+  if(s.low===null||p<s.low||p>s.high)return "dim";
+  if(s.i===null)return "plain";
+  if(p<=s.i)return "small";
+  const compareJ=(s.kind==="compare");
+  if(s.j!==null&&p<=s.j&&!(compareJ&&p===s.j))return "big";
+  return "plain";
+}
+function cur(){return L.steps[L.idx];}
+function render(){
+  const s=cur(), {slot,bw,n}=metrics();
+  const pos=new Array(n); s.arr.forEach((id,p)=>pos[id]=p);
+  const fs=Math.max(11,Math.min(20,bw*0.42));
+  stage.style.setProperty("--fs",fs+"px");
+  const canPick=(L.mode==="practice"&&L.P.waiting==="place");
+  L.bars.forEach((el,id)=>{
+    const p=pos[id], st=stateOf(s,p);
+    let cls="bar "+st;
+    if((s.kind==="compare"||s.kind==="swap")&&s.j===p)cls+=" cur";
+    if(canPick&&p>=s.low&&p<=s.high)cls+=" pickable";
+    el.className=cls;
+    el.style.width=bw+"px";el.style.height=heightOf(L.values[id])+"px";
+    el.style.transform="translateX("+(PADL+p*slot)+"px)";
+  });
+  L.idxEls.forEach((e,p)=>{e.style.width=bw+"px";e.style.transform="translateX("+(PADL+p*slot)+"px)";});
+  const mi=$("#mi"), mj=$("#mj"), rg=$("#range"), rl=$("#rangelab");
+  const showI=s.i!==null&&["pick","compare","swap","before"].includes(s.kind);
+  const showJ=s.j!==null&&["compare","swap"].includes(s.kind);
+  mi.classList.toggle("off",!showI);mj.classList.toggle("off",!showJ);
+  if(showI)mi.style.transform="translateX("+Math.max(2,PADL+s.i*slot+bw/2-22)+"px)";
+  if(showJ)mj.style.transform="translateX("+(PADL+s.j*slot+bw/2-22)+"px)";
+  if(s.low!==null&&["call","pick","compare","swap","before","place","base"].includes(s.kind)){
+    rg.style.opacity=1;rg.style.width=((s.high-s.low+1)*slot-8)+"px";rg.style.transform="translateX("+(PADL+s.low*slot)+"px)";
+    rl.textContent="working on positions "+s.low+" to "+s.high;rl.style.opacity=1;
+  }else{rg.style.opacity=0;rl.style.opacity=0;}
+  /* narration */
+  const N=L.steps.length;
+  $("#narrTag").textContent=TAGS[s.kind];$("#narrTag").className="tag t-"+s.kind;
+  $("#narrNo").textContent="Step "+(L.idx+1)+" of "+N;
+  if(!(L.mode==="practice"&&(L.P.waiting==="compare"||L.P.waiting==="place")))$("#narrTxt").innerHTML=s.text;
+  const wh=$("#why"), asking=(L.mode==="practice"&&(L.P.waiting==="compare"||L.P.waiting==="place"));
+  wh.hidden=!($("#explainToggle").checked&&s.why&&!asking);
+  if(!wh.hidden)wh.innerHTML="<b>Why?</b> "+s.why;
+  /* code */
+  $$(".cl").forEach(e=>e.classList.toggle("on",s.lines.includes(+e.dataset.l)));
+  /* stack */
+  const sb=$("#stackbox");
+  if(!s.stack.length)sb.innerHTML='<div class="empty">'+(s.kind==="end"?"No calls left. Finished.":"Empty")+'</div>';
+  else sb.innerHTML=s.stack.slice().reverse().map((f,k)=>'<div class="frame'+(k===0?" top":"")+'"><span>quickSort('+f.lo+', '+f.hi+')</span><span>['+f.vals.join(" ")+']</span></div>').join("");
+  /* stats */
+  $("#sCmp").textContent=s.cmp;$("#sSwp").textContent=s.swp;
+  $("#sFix").textContent=s.fixed.filter(Boolean).length+"/"+n;
+  $("#sMis").textContent=L.P.mistakes;
+  $("#scrub").value=L.idx;
+}
+window.addEventListener("resize",()=>{if(!$("#lab").hidden)render();else sbLayout();});
+
+/* ---- watch mode ---- */
+function stopPlay(){if(L.timer){clearInterval(L.timer);L.timer=null;}$("#playLab").textContent="Play";$("#playIcon").innerHTML='<path d="M7 4l13 8-13 8z"/>';}
+function startPlay(){
+  if(L.idx>=L.steps.length-1)L.idx=0;
+  const ms=1700-($("#speed").value-1)*160;
+  $("#playLab").textContent="Pause";$("#playIcon").innerHTML='<path d="M6 4h4v16H6zM14 4h4v16h-4z"/>';
+  render();
+  L.timer=setInterval(()=>{ if(L.idx>=L.steps.length-1){stopPlay();return;} L.idx++;render(); },ms);
+}
+function go(i){L.idx=Math.max(0,Math.min(L.steps.length-1,i));render();}
+$("#bPlay").addEventListener("click",()=>{L.timer?stopPlay():startPlay();});
+$("#bNext").addEventListener("click",()=>{stopPlay();go(L.idx+1);});
+$("#bPrev").addEventListener("click",()=>{stopPlay();go(L.idx-1);});
+$("#bRestart").addEventListener("click",()=>{stopPlay();go(0);});
+$("#explainToggle").addEventListener("change",()=>{if(L.steps.length){render();}});
+$("#scrub").addEventListener("input",e=>{stopPlay();go(+e.target.value);});
+$("#speed").addEventListener("input",()=>{if(L.timer){stopPlay();startPlay();}});
+
+function makeValues(kind){
+  const rnd=(n,mx)=>Array.from({length:n},()=>1+Math.floor(Math.random()*mx));
+  switch(kind){
+    case "random":{const s=new Set();while(s.size<7)s.add(1+Math.floor(Math.random()*30));return [...s];}
+    case "sorted":return [2,4,6,8,10,12,14];
+    case "reversed":return [14,12,10,8,6,4,2];
+    case "dups":return [5,3,5,2,5,3,2,5];
+    default:return [8,3,7,1,5,9,4];
+  }
+}
+function loadValues(vals){
+  stopPlay();clearTimeout(L.P.pt);
+  L.values=vals;L.steps=buildSteps(vals);L.idx=0;
+  L.P={waiting:null,mistakes:0,asked:0,pt:null,done:false};
+  buildStage();
+  $("#scrub").max=L.steps.length-1;
+  if(L.mode==="practice")pGo(0);else{setAsk(false);render();}
+}
+$("#preset").addEventListener("change",e=>{loadValues(makeValues(e.target.value));$("#custom").value="";});
+$("#bUse").addEventListener("click",useCustom);
+$("#custom").addEventListener("keydown",e=>{if(e.key==="Enter")useCustom();});
+function useCustom(){
+  const nums=($("#custom").value.match(/\d+/g)||[]).map(Number).filter(x=>x>=1&&x<=99);
+  if(nums.length<2){$("#custom").setCustomValidity("Type at least two numbers between 1 and 99");$("#custom").reportValidity();$("#custom").setCustomValidity("");return;}
+  loadValues(nums.slice(0,12));
+}
+$("#bCopy").addEventListener("click",async()=>{
+  const b=$("#bCopy");
+  try{await navigator.clipboard.writeText(FULL);b.textContent="Copied";}
+  catch(e){$("#fullDet").open=true;b.textContent="Select the code below";}
+  setTimeout(()=>b.textContent="Copy full program",1800);
+});
+
+/* ---- practice mode ---- */
+function setAsk(on){$("#askRow").hidden=!on;if(!on)$("#askRow").innerHTML="";}
+function fb(msg,kind){const f=$("#fb");if(!msg){f.hidden=true;return;}f.hidden=false;f.className="fb "+(kind||"");f.innerHTML=msg;}
+function pGo(i){
+  clearTimeout(L.P.pt);L.idx=i;L.P.waiting=null;setAsk(false);fb("");
+  const s=cur();
+  if(s.kind==="compare"){
+    L.P.waiting="compare";L.P.asked++;
+    render();
+    $("#narrTag").textContent="Your turn";$("#narrTag").className="tag t-ask";
+    $("#narrTxt").innerHTML="j is pointing at <b>"+s.v+"</b>. Is <b>"+s.v+"</b> smaller than the pivot <b>"+s.pv+"</b>?";
+    const r=$("#askRow");r.hidden=false;
+    r.innerHTML='<button class="btn yes" id="aYes">Yes, smaller &larr;</button><button class="btn no" id="aNo">No, not smaller &rarr;</button><button class="btn" id="aShow">Show me</button>';
+    $("#aYes").onclick=()=>answerCompare(true);$("#aNo").onclick=()=>answerCompare(false);$("#aShow").onclick=()=>answerCompare(s.small,true);
+    return;
+  }
+  if(s.kind==="before"){
+    L.P.waiting="place";L.P.asked++;
+    render();
+    $("#narrTag").textContent="Your turn";$("#narrTag").className="tag t-ask";
+    $("#narrTxt").innerHTML="The scan is over and <b>i = "+s.i+"</b>. Click the box where the pivot <b>"+L.values[s.arr[s.high]]+"</b> should go.";
+    const r=$("#askRow");r.hidden=false;r.innerHTML='<button class="btn" id="aShow">Show me</button>';
+    $("#aShow").onclick=()=>answerPlace(s.ask,true);
+    return;
+  }
+  render();
+  if(s.kind==="end"){showResult();return;}
+  if(s.kind==="swap"||s.kind==="place"){L.P.pt=setTimeout(()=>pGo(i+1),$("#explainToggle").checked?4800:1500);return;}
+  const r=$("#askRow");r.hidden=false;r.innerHTML='<button class="btn primary" id="aNext">Continue (Enter)</button>';
+  $("#aNext").onclick=()=>pGo(i+1);
+}
+function showWhy(s){const w=$("#why");if($("#explainToggle").checked&&s.why){w.hidden=false;w.innerHTML="<b>Why?</b> "+s.why;}}
+function answerCompare(ans,shown){
+  if(L.P.waiting!=="compare")return;
+  const s=cur();
+  if(ans===s.small){
+    L.P.waiting=null;setAsk(false);
+    if(shown)L.P.mistakes++;
+    fb((shown?"Here is the answer. ":"Correct. ")+(s.small?s.v+" is smaller than "+s.pv+", so it joins the smaller area.":s.v+" is not smaller than "+s.pv+(s.v===s.pv?" (equal counts as not smaller)":"")+", so it stays and j moves on."),shown?"":"ok");
+    showWhy(s);
+    L.P.pt=setTimeout(()=>pGo(L.idx+1),$("#explainToggle").checked?3800:1300);
+  }else{
+    L.P.mistakes++;$("#sMis").textContent=L.P.mistakes;
+    const nar=$("#narr");nar.classList.remove("shake");void nar.offsetWidth;nar.classList.add("shake");
+    fb(s.small?"Not quite. Compare <b>"+s.v+"</b> with <b>"+s.pv+"</b>: "+s.v+" is the smaller one.":"Not quite. <b>"+s.v+"</b> is "+(s.v===s.pv?"equal to":"bigger than")+" <b>"+s.pv+"</b>, so it is not smaller.","bad");
+  }
+}
+function onBarClick(id){
+  if(L.mode!=="practice"||L.P.waiting!=="place")return;
+  const s=cur(); const p=s.arr.indexOf(id);
+  if(p<s.low||p>s.high)return;
+  answerPlace(p,false);
+}
+function answerPlace(p,shown){
+  if(L.P.waiting!=="place")return;
+  const s=cur();
+  if(p===s.ask){
+    L.P.waiting=null;setAsk(false);if(shown)L.P.mistakes++;
+    fb((shown?"Here is the answer. ":"Correct. ")+"The pivot goes to position "+s.ask+", just after the smaller area.",shown?"":"ok");
+    showWhy(s);
+    L.P.pt=setTimeout(()=>pGo(L.idx+1),$("#explainToggle").checked?4200:1300);
+  }else{
+    L.P.mistakes++;$("#sMis").textContent=L.P.mistakes;
+    const nar=$("#narr");nar.classList.remove("shake");void nar.offsetWidth;nar.classList.add("shake");
+    fb("Not quite. Hint: the smaller area ends at <b>i = "+s.i+"</b>. The pivot goes just after it.","bad");
+  }
+}
+function showResult(){
+  L.P.done=true;
+  const asked=L.P.asked, m=L.P.mistakes;
+  const acc=Math.max(0,Math.round(100*(1-m/Math.max(1,asked+m))));
+  $("#narrTag").textContent="Sorted";$("#narrTag").className="tag t-end";
+  $("#narrTxt").innerHTML='<div class="result"><h3>Sorted! '+(m===0?"No mistakes.":m+" mistake"+(m>1?"s":"")+" along the way.")+'</h3>'+
+    '<p>You answered '+asked+' questions with about '+acc+'% accuracy, and made '+L.steps[L.steps.length-1].cmp+' comparisons in total.</p></div>';
+  const r=$("#askRow");r.hidden=false;
+  r.innerHTML='<button class="btn primary" id="rNew">New array</button><button class="btn" id="rAgain">Try this one again</button><button class="btn" id="rWatch">Watch it run</button>';
+  $("#rNew").onclick=newPractice;$("#rAgain").onclick=()=>loadValues(L.values.slice());$("#rWatch").onclick=()=>show("watch");
+}
+function newPractice(){
+  const n=+$("#level").value,s=new Set();while(s.size<n)s.add(1+Math.floor(Math.random()*30));
+  loadValues([...s]);
+}
+$("#pNew").addEventListener("click",newPractice);
+$("#level").addEventListener("change",newPractice);
+$("#pRestart").addEventListener("click",()=>loadValues(L.values.slice()));
+
+document.addEventListener("keydown",e=>{
+  if(e.target.matches("input,select,textarea"))return;
+  if($("#lab").hidden)return;
+  if(L.mode==="watch"){
+    if(e.key===" "){e.preventDefault();L.timer?stopPlay():startPlay();}
+    else if(e.key==="ArrowRight"){stopPlay();go(L.idx+1);}
+    else if(e.key==="ArrowLeft"){stopPlay();go(L.idx-1);}
+  }else{
+    if(L.P.waiting==="compare"){
+      if(e.key==="ArrowLeft"){answerCompare(true);}
+      else if(e.key==="ArrowRight"){answerCompare(false);}
+    }else if(e.key==="Enter"&&$("#aNext")&&!L.P.pt&&!L.P.waiting){e.preventDefault();$("#aNext").click();}
+    else if(e.key==="Enter"&&$("#rNew")){newPractice();}
+  }
+});
+
+/* ================= LEARN sandbox ================= */
+const SB={vals:[],segs:[],els:[],pivots:0};
+const sbStage=$("#sbStage");
+function sbInit(vals){
+  SB.vals=vals;SB.pivots=0;
+  SB.segs=[{t:"g",ids:vals.map((_,k)=>k),tint:null}];
+  sbStage.innerHTML="";SB.els=[];
+  const grp=document.createElement("div");grp.id="sbGrps";sbStage.appendChild(grp);
+  vals.forEach((v,id)=>{
+    const el=document.createElement("div");el.className="bar plain";el.textContent=v;
+    el.addEventListener("click",()=>sbTap(id));
+    el.setAttribute("role","button");el.tabIndex=0;
+    el.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();sbTap(id);}});
+    sbStage.appendChild(el);SB.els.push(el);
+  });
+  sbMsg("Tap any bar to make it the <b>pivot</b>. Everything smaller will slide left and everything bigger will slide right.","","<b>What am I seeing?</b> Each bar is a number, and taller means bigger. The pivot is only a yardstick: it splits its group into smaller numbers (green) and bigger numbers (red). Equal numbers count as bigger.");
+  sbLayout();
+}
+function sbLayout(){
+  if(!SB.vals.length)return;
+  const W=sbStage.clientWidth||520, n=SB.vals.length, gap=18, g=Math.max(0,SB.segs.length-1);
+  const slot=Math.max(22,Math.min(74,(W-28-g*gap)/n)), bw=slot-8, mx=Math.max.apply(null,SB.vals);
+  let x=14, html="";
+  const fs=Math.max(12,Math.min(20,bw*0.42));
+  sbStage.style.setProperty("--fs",fs+"px");
+  SB.segs.forEach(seg=>{
+    if(seg.t==="f"){place(seg.id,x,"fixed",false);x+=slot+gap;}
+    else{
+      const x0=x;
+      seg.ids.forEach(id=>{place(id,x,seg.tint||"plain",seg.ids.length>1);x+=slot;});
+      html+='<div class="grp '+(seg.tint||"")+'" style="left:'+(x0-4)+'px;width:'+(seg.ids.length*slot)+'px"></div>';
+      x+=gap;
+    }
+  });
+  $("#sbGrps").innerHTML=html;
+  function place(id,xx,cls,clickable){
+    const el=SB.els[id];
+    el.className="bar "+cls+(clickable?" pickable":"");
+    el.style.width=bw+"px";el.style.height=(44+SB.vals[id]/mx*148)+"px";el.style.transform="translateX("+xx+"px)";
+    el.setAttribute("aria-label","Number "+SB.vals[id]+(clickable?", tap to use as pivot":", in final place"));
+  }
+}
+function sbMsg(html,cls,why){const m=$("#sbMsg");m.innerHTML=html+(why?'<div class="sbwhy">'+why+'</div>':"");m.className="sbmsg "+(cls||"");}
+function mk(ids,tint){if(!ids.length)return [];if(ids.length===1)return [{t:"f",id:ids[0]}];return [{t:"g",ids,tint}];}
+function sbTap(id){
+  const k=SB.segs.findIndex(s=>s.t==="g"&&s.ids.includes(id));
+  if(k<0)return;
+  const seg=SB.segs[k], pv=SB.vals[id];
+  const rest=seg.ids.filter(x=>x!==id);
+  const left=rest.filter(x=>SB.vals[x]<pv), right=rest.filter(x=>SB.vals[x]>=pv);
+  SB.segs.splice(k,1,...mk(left,"small"),{t:"f",id},...mk(right,"big"));
+  SB.pivots++;
+  $("#sbCount").textContent="Pivots chosen: "+SB.pivots;
+  const Ln=left.length,Rn=right.length,groups=SB.segs.filter(x=>x.t==="g").length;
+  let why="<b>Why does "+pv+" stay there?</b> In this group, "+Ln+" number"+(Ln===1?" is":"s are")+" smaller than "+pv+", so exactly "+Ln+" number"+(Ln===1?"":"s")+" must come before it. Its place is now fixed. It turns indigo and never moves again.";
+  if(rest.length>1&&(Ln===0||Rn===0))why+=" <b>Lopsided split:</b> every other number went to one side, so this pivot did very little work. Always picking the smallest or biggest number is why an already sorted list is the worst case.";
+  else if(Ln>0&&Rn>0)why+=" <b>Balanced split:</b> both sides got numbers, so the remaining work is shared. That is what makes quick sort fast.";
+  if(SB.segs.every(x=>x.t==="f")){
+    sbMsg("<b>Sorted!</b> You used <b>"+SB.pivots+" pivots</b>. Press Start over and try choosing middle-sized numbers: balanced splits need fewer rounds.","done",
+      "<b>Why is it sorted?</b> Every number became a pivot or a one-number group, and each one landed in its final place. Nobody had to be compared with every other number.");
+  }else{
+    sbMsg("Pivot <b>"+pv+"</b>: <b>"+Ln+"</b> smaller "+(Ln===1?"number goes":"numbers go")+" left, <b>"+Rn+"</b> "+(Rn===1?"number goes":"numbers go")+" right. <b>"+pv+"</b> is now in its final place.","",
+      why+" <b>What next?</b> There "+(groups===1?"is":"are")+" now "+groups+" dashed group"+(groups===1?"":"s")+". Each one is its own smaller sorting job, so you can do them in any order. Tap a bar inside a dashed group.");
+  }
+  sbLayout();
+}
+$("#sbReset").addEventListener("click",()=>{$("#sbCount").textContent="";sbInit(SB.vals.slice());});
+$("#sbShuffle").addEventListener("click",()=>{const s=new Set();while(s.size<7)s.add(1+Math.floor(Math.random()*9));$("#sbCount").textContent="";sbInit([...s]);});
+
+/* ================= navigation ================= */
+function show(view){
+  stopPlay();clearTimeout(L.P.pt);
+  $$(".tab").forEach(t=>t.setAttribute("aria-selected",String(t.dataset.view===view)));
+  const isLab=view!=="learn";
+  $("#learn").hidden=isLab;$("#lab").hidden=!isLab;
+  if(isLab){
+    L.mode=view;$("#lab").dataset.mode=view;
+    if(view==="practice"){newPractice();}
+    else{ if(!L.values.length||L.mode!=="watch"||true){loadValues(makeValues($("#preset").value));} }
+  }else sbLayout();
+}
+$$(".tab").forEach(t=>t.addEventListener("click",()=>show(t.dataset.view)));
+$$("[data-go]").forEach(b=>b.addEventListener("click",()=>show(b.dataset.go)));
+
+/* start */
+sbInit([8,3,7,1,5,9,4]);
+const h=(location.hash||"").replace("#","");
+if(h==="watch"||h==="practice")show(h);
+})();
+</script>
+</body>
 </html>
