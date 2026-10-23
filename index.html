@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QuickSort Studio — Interactive Visual Learning Lab</title>
+    <meta name="description" content="Master QuickSort through interactive step-by-step visualizations, synchronized code execution, divide-and-conquer recursion trees, and gamified challenges." />
+
+    <!-- Google Fonts: Outfit & Inter & Fira Code -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <!-- App Container -->
+    <div id="app" class="app-root">
+      <!-- Global Navigation Header -->
+      <header class="app-header glass-panel">
+        <div class="header-left">
+          <div class="brand-logo">
+            <span class="brand-icon">⚡</span>
+            <div class="brand-text">
+              <h1 class="brand-title">QuickSort <span class="gradient-text">Studio</span></h1>
+              <span class="brand-subtitle">Interactive Learning Lab</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Navigation Tabs -->
+        <nav class="main-nav" role="tablist">
+          <button class="nav-tab active" data-tab="visualizer" id="tabVisualizer" role="tab" aria-selected="true">
+            <span class="tab-icon">🚀</span>
+            <span class="tab-label">Visualizer</span>
+          </button>
+          <button class="nav-tab" data-tab="walkthrough" id="tabWalkthrough" role="tab" aria-selected="false">
+            <span class="tab-icon">📖</span>
+            <span class="tab-label">Learn Step-by-Step</span>
+          </button>
+          <button class="nav-tab" data-tab="playground" id="tabPlayground" role="tab" aria-selected="false">
+            <span class="tab-icon">🎮</span>
+            <span class="tab-label">Playground & Quiz</span>
+          </button>
+          <button class="nav-tab" data-tab="complexity" id="tabComplexity" role="tab" aria-selected="false">
+            <span class="tab-icon">📊</span>
+            <span class="tab-label">Complexity Lab</span>
+          </button>
+        </nav>
+
+        <!-- Header Actions -->
+        <div class="header-right">
+          <button class="btn btn-sm btn-ghost" id="btnHelpModal" title="Keyboard Shortcuts & Guide">
+            <span class="btn-icon">⌨️</span>
+            <span class="btn-label-desktop">Shortcuts</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Dynamic Content -->
+      <main class="app-content">
+        <!-- Tab 1: Visualizer Stage -->
+        <section class="tab-pane active" id="paneVisualizer" role="tabpanel">
+          <div class="visualizer-grid-layout">
+            <div class="visualizer-main-column" id="visualizerContainer">
+              <!-- Visualizer rendered here -->
+            </div>
+            
+            <aside class="visualizer-side-column">
+              <div class="side-tabs-header">
+                <button class="side-tab active" data-side="code">💻 Synced Code</button>
+                <button class="side-tab" data-side="tree">🌳 Recursion Tree</button>
+              </div>
+              <div class="side-panel-content">
+                <div class="side-pane active" id="sidePaneCode">
+                  <!-- CodeViewer rendered here -->
+                </div>
+                <div class="side-pane" id="sidePaneTree">
+                  <!-- RecursionTree rendered here -->
+                </div>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <!-- Tab 2: Walkthrough Guide -->
+        <section class="tab-pane" id="paneWalkthrough" role="tabpanel">
+          <div id="walkthroughContainer">
+            <!-- Walkthrough rendered here -->
+          </div>
+        </section>
+
+        <!-- Tab 3: Playground Challenges -->
+        <section class="tab-pane" id="panePlayground" role="tabpanel">
+          <div id="playgroundContainer">
+            <!-- Playground rendered here -->
+          </div>
+        </section>
+
+        <!-- Tab 4: Complexity Lab -->
+        <section class="tab-pane" id="paneComplexity" role="tabpanel">
+          <div id="complexityContainer">
+            <!-- Complexity lab rendered here -->
+          </div>
+        </section>
+      </main>
+
+      <!-- Footer with Keyboard shortcuts -->
+      <footer class="app-footer glass-panel">
+        <div class="footer-left">
+          <span>⚡ <strong>QuickSort Studio</strong> — An interactive visual exploration of divide & conquer.</span>
+        </div>
+        <div class="footer-center">
+          <div class="shortcut-pills">
+            <span class="kbd-pill"><kbd>Space</kbd> Play/Pause</span>
+            <span class="kbd-pill"><kbd>←</kbd> Prev</span>
+            <span class="kbd-pill"><kbd>→</kbd> Next</span>
+            <span class="kbd-pill"><kbd>R</kbd> Reset</span>
+          </div>
+        </div>
+        <div class="footer-right">
+          <span class="tech-badge">Vanilla CSS & JS</span>
+        </div>
+      </footer>
+
+      <!-- Keyboard Shortcuts / Help Modal -->
+      <dialog id="shortcutsDialog" class="modal-dialog glass-panel">
+        <div class="modal-header">
+          <h3>⌨️ Keyboard Shortcuts & Quick Guide</h3>
+          <button type="button" class="btn-close" id="btnCloseShortcuts">✕</button>
+        </div>
+        <div class="modal-body">
+          <table class="shortcuts-table">
+            <tr>
+              <td><kbd>Space</kbd></td>
+              <td>Toggle Play / Pause simulation</td>
+            </tr>
+            <tr>
+              <td><kbd>→</kbd> Right Arrow</td>
+              <td>Step forward one operation</td>
+            </tr>
+            <tr>
+              <td><kbd>←</kbd> Left Arrow</td>
+              <td>Step backward (Time travel undo)</td>
+            </tr>
+            <tr>
+              <td><kbd>R</kbd></td>
+              <td>Reset current array to step 0</td>
+            </tr>
+          </table>
+          <hr class="modal-divider" />
+          <h4>🎨 Color Guide:</h4>
+          <ul class="modal-color-guide">
+            <li><span class="dot-gold"></span> <strong>Gold:</strong> Pivot element (the partition benchmark)</li>
+            <li><span class="dot-cyan"></span> <strong>Cyan:</strong> Pointer <code>i</code> (boundary for elements ≤ pivot)</li>
+            <li><span class="dot-purple"></span> <strong>Purple:</strong> Pointer <code>j</code> (current scanner)</li>
+            <li><span class="dot-coral"></span> <strong>Coral:</strong> Elements actively swapping</li>
+            <li><span class="dot-green"></span> <strong>Green:</strong> Elements in their final locked sorted position</li>
+          </ul>
+        </div>
+      </dialog>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
