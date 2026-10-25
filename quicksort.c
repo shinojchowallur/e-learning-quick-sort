@@ -39,15 +39,25 @@ void printArray(int arr[], int n) {
 }
 
 int main() {
-    int arr[] = {8, 3, 7, 1, 5, 9, 4};
-    int n = sizeof(arr) / sizeof(arr[0]);
+    int n;
 
-    printf("Before sorting: ");
+    printf("Enter number of elements: ");
+    scanf("%d", &n);
+
+    int arr[n];
+
+    printf("Enter %d elements:\n", n);
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &arr[i]);
+    }
+
+    printf("\nBefore sorting: ");
     printArray(arr, n);
 
     quickSort(arr, 0, n - 1);
 
     printf("After sorting : ");
     printArray(arr, n);
+
     return 0;
 }

@@ -115,7 +115,7 @@ button,input,select{font:inherit;color:inherit}
 .cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
 
 /* ---------- LAB ---------- */
-.labgrid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:20px;align-items:start}
+.labgrid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:20px;align-items:start}
 .col{display:flex;flex-direction:column;gap:14px;min-width:0}
 .stage{position:relative;height:376px;overflow:hidden;padding:0}
 .stage .idx{position:absolute;top:276px;left:0;font:600 12px var(--font-mono);color:var(--muted);text-align:center;transition:none}
@@ -159,7 +159,7 @@ input[type=text]{flex:1;min-width:150px;font-family:var(--font-mono);font-size:1
 .hint kbd{font:600 12px var(--font-mono);background:var(--surface2);border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 6px}
 
 .codewrap{display:flex;flex-direction:column;gap:10px}
-.codebox{background:var(--code-bg);color:var(--code-fg);border-radius:14px;padding:12px 0;font:400 13px/1.55 var(--font-mono);overflow-x:auto}
+.codebox{background:var(--code-bg);color:var(--code-fg);border-radius:14px;padding:12px 0;font:400 12.5px/1.55 var(--font-mono);overflow-x:auto}
 .cl{display:flex;white-space:pre;border-left:3px solid transparent;padding-right:14px}
 .cl .ln{width:34px;flex:none;text-align:right;padding-right:12px;color:var(--code-dim);user-select:none}
 .cl.on{background:rgba(245,163,10,.17);border-left-color:var(--pivot)}
@@ -194,6 +194,39 @@ details.full pre{margin:10px 0 0;font:400 12.5px/1.5 var(--font-mono);overflow-x
 
 @media (max-width:900px){.learn-grid,.labgrid{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:520px){.tab{padding:9px 12px}.narr .txt{font-size:17.5px}.stat{min-width:0;flex:1}}
+
+/* ---------- THEORY ---------- */
+.theory-wrap{display:flex;flex-direction:column;gap:24px}
+.theory-hero{max-width:760px;display:flex;flex-direction:column;gap:8px}
+.theory-hero h1{font-size:clamp(28px,4.5vw,44px);font-weight:800;letter-spacing:-.02em}
+.theory-hero p{font-size:18px;color:var(--muted)}
+.theory-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px}
+.theory-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:14px;
+  transition:transform .2s,box-shadow .2s}
+.theory-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(20,24,48,.12)}
+.theory-card h2{font-size:22px;display:flex;align-items:center;gap:10px;margin:0}
+.tc-icon{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:20px;flex-shrink:0}
+.theory-card ul{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:10px;color:var(--muted);font-size:15.5px;line-height:1.55}
+.theory-card li b{color:var(--fg);font-weight:700}
+.tc-table{width:100%;border-collapse:separate;border-spacing:0;font-size:15px;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+.tc-table th,.tc-table td{text-align:left;padding:12px 16px}
+.tc-table th{font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);background:var(--surface2)}
+.tc-table td{border-top:1px solid var(--line)}
+.tc-table td:nth-child(2){font-family:var(--font-mono);font-weight:600;font-size:14px}
+.tc-badge{display:inline-block;padding:3px 10px;border-radius:8px;font-size:12px;font-weight:700;font-family:var(--font-body)}
+.tc-best{background:var(--good-bg);color:var(--small)}
+.tc-avg{background:var(--warn-bg)}
+.tc-worst{background:var(--bad-bg);color:var(--big)}
+.tc-note{color:var(--muted);font-size:14.5px;line-height:1.55;background:var(--surface2);border-radius:12px;padding:14px 16px}
+.tc-note b{color:var(--fg)}
+.theory-summary{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:12px;
+  transition:transform .2s,box-shadow .2s}
+.theory-summary:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(20,24,48,.12)}
+.theory-summary h2{font-size:22px;display:flex;align-items:center;gap:10px;margin:0}
+.theory-summary p{color:var(--muted);font-size:16px;line-height:1.6}
+.theory-summary b{color:var(--fg)}
+
+@media (max-width:520px){.theory-grid{grid-template-columns:1fr}}
 </style>
 
 <style>body{margin:0}[hidden]{display:none!important}</style>
@@ -209,6 +242,7 @@ details.full pre{margin:10px 0 0;font:400 12.5px/1.5 var(--font-mono);overflow-x
       <button class="tab" role="tab" id="tab-learn" data-view="learn" aria-selected="true">Learn</button>
       <button class="tab" role="tab" id="tab-watch" data-view="watch" aria-selected="false">Watch</button>
       <button class="tab" role="tab" id="tab-practice" data-view="practice" aria-selected="false">Practice</button>
+      <button class="tab" role="tab" id="tab-theory" data-view="theory" aria-selected="false">Theory</button>
     </div>
   </header>
 
@@ -307,13 +341,81 @@ details.full pre{margin:10px 0 0;font:400 12.5px/1.5 var(--font-mono);overflow-x
         <div class="codewrap">
           <div class="codebar"><h3>The C code, line by line</h3><button class="btn" id="bCopy">Copy full program</button></div>
           <div class="codebox" id="codebox" aria-label="C source, current line highlighted"></div>
-          <details class="full" id="fullDet"><summary>Show the full C program (with main)</summary><pre id="fullCode"></pre></details>
+          <details class="full" id="fullDet">
+            <summary>Show the full C program (with main)</summary>
+            <pre id="fullCode"></pre>
+          </details>
         </div>
         <div class="card stack">
           <h3>Calls waiting (the recursion stack)</h3>
           <div class="stackbox" id="stackbox"></div>
           <p class="hint" style="margin-top:8px">The top call is the part being worked on right now. When it finishes, the one below it continues.</p>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THEORY -->
+  <section id="theory" hidden>
+    <div class="wrap theory-wrap">
+      <div class="theory-hero">
+        <h1>Quick Sort: Core Theory</h1>
+        <p>Short, simple, point-wise explanation for easy understanding and presentations.</p>
+      </div>
+
+      <div class="theory-grid">
+        <!-- Time Complexity -->
+        <div class="theory-card">
+          <h2><span class="tc-icon" style="background:var(--warn-bg)">&#9201;</span> Time Complexity</h2>
+          <table class="tc-table">
+            <thead><tr><th>Case</th><th>Time</th><th>Reason</th></tr></thead>
+            <tbody>
+              <tr><td><span class="tc-badge tc-best">Best</span></td><td>O(n log n)</td><td>Pivot divides array into 2 equal halves</td></tr>
+              <tr><td><span class="tc-badge tc-avg">Average</span></td><td>O(n log n)</td><td>Typical random array (most real cases)</td></tr>
+              <tr><td><span class="tc-badge tc-worst">Worst</span></td><td>O(n&sup2;)</td><td>Array already sorted (unbalanced split)</td></tr>
+            </tbody>
+          </table>
+          <ul style="margin-top:6px">
+            <li><b>Space Complexity:</b> <code>O(log n)</code> &mdash; in-place sorting, uses minimal memory for recursion calls.</li>
+          </ul>
+        </div>
+
+        <!-- Advantages -->
+        <div class="theory-card">
+          <h2><span class="tc-icon" style="background:var(--good-bg)">&#10004;</span> Advantages</h2>
+          <ul>
+            <li><b>Very Fast:</b> Faster in practice than Bubble, Selection, or Insertion Sort.</li>
+            <li><b>In-Place:</b> Sorts the array directly without allocating extra helper arrays.</li>
+            <li><b>Divide and Conquer:</b> Breaks large sorting tasks into smaller, independent parts.</li>
+            <li><b>Widely Used:</b> Standard default sorting algorithm in C (<code>qsort</code>), C++, and Java.</li>
+          </ul>
+        </div>
+
+        <!-- Disadvantages -->
+        <div class="theory-card">
+          <h2><span class="tc-icon" style="background:var(--bad-bg)">&#9888;</span> Disadvantages</h2>
+          <ul>
+            <li><b>O(n&sup2;) Worst Case:</b> Occurs when array is already sorted and pivot is at the end.</li>
+            <li><b>Not Stable:</b> Elements with equal values may not retain original relative positions.</li>
+            <li><b>Recursion Stack:</b> Uses recursive function calls that consume call stack memory.</li>
+            <li><b>Not for Tiny Lists:</b> Simpler algorithms (like Insertion Sort) are faster for lists under ~10 items.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="theory-summary">
+        <h2>&#128161; 3-Step Summary</h2>
+        <ul style="margin:0;padding-left:22px;display:flex;flex-direction:column;gap:6px;color:var(--muted);font-size:16px">
+          <li><b>1. Pick a Pivot:</b> Select one element from the array (commonly the last element).</li>
+          <li><b>2. Partition:</b> Shift smaller elements to the left, larger elements to the right.</li>
+          <li><b>3. Recurse:</b> Repeat the same steps on the left and right halves until fully sorted.</li>
+        </ul>
+      </div>
+
+      <div class="cta" style="margin-top:6px">
+        <button class="btn primary" data-go="watch">Watch Quick Sort in action</button>
+        <button class="btn" data-go="practice">Test yourself</button>
+        <button class="btn" data-go="learn">Back to Learn</button>
       </div>
     </div>
   </section>
@@ -386,16 +488,26 @@ void printArray(int arr[], int n) {
 }
 
 int main() {
-    int arr[] = {8, 3, 7, 1, 5, 9, 4};
-    int n = sizeof(arr) / sizeof(arr[0]);
+    int n;
 
-    printf("Before sorting: ");
+    printf("Enter number of elements: ");
+    scanf("%d", &n);
+
+    int arr[n];
+
+    printf("Enter %d elements:\n", n);
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &arr[i]);
+    }
+
+    printf("\nBefore sorting: ");
     printArray(arr, n);
 
     quickSort(arr, 0, n - 1);
 
     printf("After sorting : ");
     printArray(arr, n);
+
     return 0;
 }
 `;
@@ -410,6 +522,7 @@ function hlLine(s){
 }
 $("#codebox").innerHTML=CODE.map((l,i)=>'<div class="cl" data-l="'+i+'"><span class="ln">'+(i+1)+'</span><span>'+(l?hlLine(l):" ")+'</span></div>').join("");
 $("#fullCode").textContent=FULL;
+
 
 /* ================= step engine ================= */
 function buildSteps(values){
@@ -772,13 +885,13 @@ $("#sbShuffle").addEventListener("click",()=>{const s=new Set();while(s.size<7)s
 function show(view){
   stopPlay();clearTimeout(L.P.pt);
   $$(".tab").forEach(t=>t.setAttribute("aria-selected",String(t.dataset.view===view)));
-  const isLab=view!=="learn";
-  $("#learn").hidden=isLab;$("#lab").hidden=!isLab;
+  const isLab=view==="watch"||view==="practice";
+  $("#learn").hidden=view!=="learn";$("#lab").hidden=!isLab;$("#theory").hidden=view!=="theory";
   if(isLab){
     L.mode=view;$("#lab").dataset.mode=view;
     if(view==="practice"){newPractice();}
     else{ if(!L.values.length||L.mode!=="watch"||true){loadValues(makeValues($("#preset").value));} }
-  }else sbLayout();
+  }else if(view==="learn") sbLayout();
 }
 $$(".tab").forEach(t=>t.addEventListener("click",()=>show(t.dataset.view)));
 $$("[data-go]").forEach(b=>b.addEventListener("click",()=>show(b.dataset.go)));
@@ -786,7 +899,7 @@ $$("[data-go]").forEach(b=>b.addEventListener("click",()=>show(b.dataset.go)));
 /* start */
 sbInit([8,3,7,1,5,9,4]);
 const h=(location.hash||"").replace("#","");
-if(h==="watch"||h==="practice")show(h);
+if(h==="watch"||h==="practice"||h==="theory")show(h);
 })();
 </script>
 </body>
